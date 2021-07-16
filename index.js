@@ -23,14 +23,20 @@ const { google } = require("googleapis");
   await browser.close();
 })();
 
-function SelectAds (DomObject) {
-  //  console.log(DomObject)
+// taking a domObject and converting it into an array of ads
+function SelectAds (domObject) {
+  //  console.log(domObject)
    let allAds = []
-  DomObject.window.document.querySelectorAll("[data-text-ad]").forEach( ad =>{
+  // iterating over an ad list
+  domObject.window.document.querySelectorAll("[data-text-ad]").forEach( (ad, index) =>{
+    // console.log(ad.textContent)
     let newAd = []
-    let date = Date.prototype.getDate()
+    let position = index + 1
+    let div = ad.children
+    let description = div[0].children[1].querySelector("span").textContent ||= "No description"
+    // let date = Date.prototype.getDate()
     let Headline = ad.querySelector("[role]").textContent
-    console.log(Headline)
+    console.log(position)
     // SendAds(ad.textContent)
   })
 }
