@@ -2,17 +2,17 @@ const { firefox } = require('playwright');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { google } = require("googleapis");
-
+const keyword = "hair+transplant";
 
 (async () => {
   const browser = await firefox.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
-  let keyword = "hair+transplant"
   await page.goto(`https://www.google.com/search?q=${keyword}`);
   const content = await page.content();
   let dom = new JSDOM (content)
-  SelectAds(dom)
+  let scrappedAds = SelectAds(dom)
+  SendAds(scrappedAds)
   // Array.from(dom.window.document.querySelectorAll("[data-text-ad]")).map( ad =>
   //   // console.log(ad.textContent),
   //   SendAds(ad.textContent)
@@ -30,15 +30,20 @@ function SelectAds (domObject) {
   // iterating over an ad list
   domObject.window.document.querySelectorAll("[data-text-ad]").forEach( (ad, index) =>{
     // console.log(ad.textContent)
-    let newAd = []
+    let today = new Date();
+    let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
     let position = index + 1
+    let headline = ad.querySelector("[role]").textContent
     let div = ad.children
     let description = div[0].children[1].querySelector("span").textContent ||= "No description"
-    // let date = Date.prototype.getDate()
-    let Headline = ad.querySelector("[role]").textContent
-    console.log(position)
+    let path = ad.querySelector("span:nth-child(2)").textContent
+    let newAd = [date, keyword, position, headline, description, path]
+    allAds.push(newAd)
     // SendAds(ad.textContent)
   })
+
+  console.log(allAds)
+  return allAds  
 }
 
 async function SendAds (ads) {
@@ -62,7 +67,7 @@ async function SendAds (ads) {
       range: "Sheet1",
       valueInputOption: "USER_ENTERED",
       resource: {
-        values: [[ads]],
+        values: ads,
       },
     })
 
