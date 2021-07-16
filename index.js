@@ -2,7 +2,7 @@ const { firefox } = require('playwright');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { google } = require("googleapis");
-const keyword = "hair+transplant";
+const keyword = "hotels";
 
 (async () => {
   const browser = await firefox.launch();
@@ -12,14 +12,7 @@ const keyword = "hair+transplant";
   const content = await page.content();
   let dom = new JSDOM (content)
   let scrappedAds = SelectAds(dom)
-  SendAds(scrappedAds)
-  // Array.from(dom.window.document.querySelectorAll("[data-text-ad]")).map( ad =>
-  //   // console.log(ad.textContent),
-  //   SendAds(ad.textContent)
-  //   )
-    
-  // console.log(content.includes("data-text-ad"));
-
+  sendAds(scrappedAds)
   await browser.close();
 })();
 
@@ -27,26 +20,44 @@ const keyword = "hair+transplant";
 function SelectAds (domObject) {
   //  console.log(domObject)
    let allAds = []
+   let today = new Date();
+   let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();
   // iterating over an ad list
+  if (domObject.window.document.querySelector("*").outerHTML.includes("data-text-ad")){
   domObject.window.document.querySelectorAll("[data-text-ad]").forEach( (ad, index) =>{
-    // console.log(ad.textContent)
-    let today = new Date();
-    let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-    let position = index + 1
-    let headline = ad.querySelector("[role]").textContent
-    let div = ad.children
-    let description = div[0].children[1].querySelector("span").textContent ||= "No description"
-    let path = ad.querySelector("span:nth-child(2)").textContent
-    let newAd = [date, keyword, position, headline, description, path]
-    allAds.push(newAd)
-    // SendAds(ad.textContent)
+    let position = index + 1;
+    let headline = ad.querySelector("[role]").textContent;
+    let div = ad.children;
+    console.log(div[0])
+    let description = div[0].children[1].querySelector("span").textContent ||= "No description";
+    let path = ad.querySelector("span:nth-child(2)").textContent;
+    let newAd = [date, keyword, position, headline, description, path];
+    allAds.push(newAd);
+    // sendAds(ad.textContent)
   })
-
-  console.log(allAds)
-  return allAds  
+    
+} else if (domObject.window.document.querySelector("*").outerHTML.includes(".top-pla-group-inner")) {
+  domObject.window.document.querySelectorAll(".top-pla-group-inner").forEach( (ad, index) =>{
+    let position = index + 1;
+    let headline = ad.querySelector("[role]").textContent;
+    let div = ad.children;
+    console.log(div[0])
+    let description = div[0].children[1].querySelector("span").textContent ||= "No description";
+    let path = ad.querySelector("span:nth-child(2)").textContent;
+    let newAd = [date, keyword, position, headline, description, path];
+    allAds.push(newAd);
+    // sendAds(ad.textContent)
+  })
 }
 
-async function SendAds (ads) {
+else {
+    let noAds = [date, keyword, "N/A", "N/A", "N/A", "N/A"]
+    allAds.push(noAds)
+}
+return allAds
+}
+
+async function sendAds (ads) {
 
   const auth = new google.auth.GoogleAuth({
     keyFile: "credentials.json",
