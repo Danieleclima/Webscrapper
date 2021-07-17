@@ -28,8 +28,8 @@ function SelectAds (domObject) {
     let position = index + 1;
     let headline = ad.querySelector("[role]").textContent;
     let div = ad.children;
-    console.log(div[0])
-    let description = div[0].children[1].querySelector("span").textContent ||= "No description";
+    console.log(div[0].children[0].textContent)
+    let description = div[0].children[0].querySelectorAll("div")[21].textContent
     let path = ad.querySelector("span:nth-child(2)").textContent;
     let newAd = [date, keyword, position, headline, description, path];
     allAds.push(newAd);
@@ -37,15 +37,16 @@ function SelectAds (domObject) {
   })
     
 } else if (domObject.window.document.querySelector("*").outerHTML.includes(".top-pla-group-inner")) {
-  domObject.window.document.querySelectorAll(".top-pla-group-inner").forEach( (ad, index) =>{
+  domObject.window.document.querySelectorAll(".pla-unit-container").forEach( (ad, index) =>{
     let position = index + 1;
-    let headline = ad.querySelector("[role]").textContent;
-    let div = ad.children;
-    console.log(div[0])
-    let description = div[0].children[1].querySelector("span").textContent ||= "No description";
-    let path = ad.querySelector("span:nth-child(2)").textContent;
-    let newAd = [date, keyword, position, headline, description, path];
-    allAds.push(newAd);
+    console.log(ad.querySelector(".pla-unit-title").textContent)
+    // let headline = ad.querySelector("[role]").textContent;
+    // let div = ad.children;
+    // console.log(div[0])
+    // let description = div[0].children[1].querySelector("span").textContent ||= "No description";
+    // let path = ad.querySelector("span:nth-child(2)").textContent;
+    // let newAd = [date, keyword, position, headline, description, path];
+    // allAds.push(newAd);
     // sendAds(ad.textContent)
   })
 }
