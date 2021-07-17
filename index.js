@@ -2,7 +2,11 @@ const { firefox } = require('playwright');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { google } = require("googleapis");
-const keyword = "hotels";
+const keyword = "white+shoes";
+const today = new Date();
+const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();
+
+
 
 (async () => {
   const browser = await firefox.launch();
@@ -11,51 +15,62 @@ const keyword = "hotels";
   await page.goto(`https://www.google.com/search?q=${keyword}`);
   const content = await page.content();
   let dom = new JSDOM (content)
-  let scrappedAds = SelectAds(dom)
-  sendAds(scrappedAds)
+  let textAds = aggregateAds(dom)
+  sendAds(textAds);
   await browser.close();
 })();
 
-// taking a domObject and converting it into an array of ads
-function SelectAds (domObject) {
-  //  console.log(domObject)
-   let allAds = []
-   let today = new Date();
-   let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();
+// fetching all text ads from the DOM
+function selectTextAds (domObject) {
+   let allTextAds = []
   // iterating over an ad list
   if (domObject.window.document.querySelector("*").outerHTML.includes("data-text-ad")){
   domObject.window.document.querySelectorAll("[data-text-ad]").forEach( (ad, index) =>{
     let position = index + 1;
     let headline = ad.querySelector("[role]").textContent;
-    let div = ad.children;
-    console.log(div[0].children[0].textContent)
-    let description = div[0].children[0].querySelectorAll("div")[21].textContent
+    let description = ""
+      if (ad.querySelector("em")){
+      description = ad.querySelector("em").parentElement.textContent
+      } else {
+      description = ad.textContent
+      }
     let path = ad.querySelector("span:nth-child(2)").textContent;
-    let newAd = [date, keyword, position, headline, description, path];
-    allAds.push(newAd);
-    // sendAds(ad.textContent)
+    let type = "Text Ad";
+    let newTextAd = [date, keyword, position, headline, description, path, type];
+    allTextAds.push(newTextAd);
   })
     
-} else if (domObject.window.document.querySelector("*").outerHTML.includes(".top-pla-group-inner")) {
-  domObject.window.document.querySelectorAll(".pla-unit-container").forEach( (ad, index) =>{
-    let position = index + 1;
-    console.log(ad.querySelector(".pla-unit-title").textContent)
-    // let headline = ad.querySelector("[role]").textContent;
-    // let div = ad.children;
-    // console.log(div[0])
-    // let description = div[0].children[1].querySelector("span").textContent ||= "No description";
-    // let path = ad.querySelector("span:nth-child(2)").textContent;
-    // let newAd = [date, keyword, position, headline, description, path];
-    // allAds.push(newAd);
-    // sendAds(ad.textContent)
-  })
+} else {
+    let noAds = [date, keyword, "N/A", "N/A", "N/A", "N/A", type]
+    allTextAds.push(noAds)
+}
+return allTextAds
 }
 
-else {
-    let noAds = [date, keyword, "N/A", "N/A", "N/A", "N/A"]
-    allAds.push(noAds)
+// fetching all Shopping ads from the DOM
+function selectShoppingAds (domObject) {
+  let allShoppingAds = []
+   if (domObject.window.document.querySelector("*").outerHTML.includes("top-pla-group-inner")) {
+     let list = Array.from(domObject.window.document.querySelectorAll(".pla-unit-container"))
+     list.pop();
+    list.forEach( (ad, index) =>{
+      let position = index + 1;
+      let headline = ad.querySelector(".pla-unit-title").textContent
+      let advertiser = ad.querySelectorAll("span")[2].textContent
+      let type = "Shopping Ad"
+      let newShoppingAd = [date, keyword, position, headline, "N/A", advertiser, type]
+      allShoppingAds.push(newShoppingAd)
+    })
+  } else {
+    let noAds = [date, keyword, "N/A", "N/A", "N/A", "N/A", type]
+    allTextAds.push(noAds)
 }
-return allAds
+}
+
+function aggregateAds (domObject) {
+  let arrayofAds = selectTextAds(domObject).concat(selectShoppingAds(domObject))
+  console.log(arrayofAds.flat())
+  return arrayofAds.flat()
 }
 
 async function sendAds (ads) {
