@@ -2,7 +2,7 @@ const { firefox } = require("playwright");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { google } = require("googleapis");
-const keyword = "red+shoes";
+const keyword = "shoes+for+men";
 const today = new Date();
 const date =
   today.getFullYear() +
@@ -15,14 +15,19 @@ const date =
   ":" +
   today.getMinutes();
 
+  // This function launches a headless browser in order to scrape Google SERP.
+  // Please replace the value of the keyword variable with the keyword that you would like to search for.
 (async () => {
+  console.log("launching browser");
   const browser = await firefox.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(`https://www.google.com/search?q=${keyword}`);
   const content = await page.content();
+  console.log("fetching ads from Google SERP");
   let dom = new JSDOM(content);
   let Ads = aggregateAds(dom);
+  console.log("sending Ads to Google Sheets");
   sendAds(Ads);
   await browser.close();
 })();
@@ -37,9 +42,10 @@ function selectTextAds(domObject) {
       .querySelector("*")
       .outerHTML.includes("data-text-ad")
   ) {
+    console.log("creating an array of text ads");
     domObject.window.document
       .querySelectorAll("[data-text-ad]")
-      .forEach((ad, index) => {
+      .forEach((ad, index) => {        
         let position = index + 1;
         let headline = ad.querySelector("[role]").textContent;
         let description = "";
@@ -61,7 +67,16 @@ function selectTextAds(domObject) {
         allTextAds.push(newTextAd);
       });
   } else {
-    let noAds = [date, keyword, "N/A", "N/A", "N/A", "N/A", type];
+    let noAds = [
+      date,
+      keyword,
+      "N/A",
+      "N/A",
+      "N/A",
+      "N/A",
+      type,
+      "No text ads",
+    ];
     allTextAds.push(noAds);
   }
   return allTextAds;
@@ -76,6 +91,7 @@ function selectShoppingAds(domObject) {
       .querySelector("*")
       .outerHTML.includes("top-pla-group-inner")
   ) {
+    console.log("Creating an array of shopping ads");
     let list = Array.from(
       domObject.window.document.querySelectorAll(".pla-unit-container")
     );
@@ -83,7 +99,12 @@ function selectShoppingAds(domObject) {
     list.forEach((ad, index) => {
       let position = index + 1;
       let headline = ad.querySelector(".pla-unit-title").textContent;
-      let advertiser = ad.querySelectorAll("span")[2].textContent;
+      let advertiser = "";
+      if (ad.querySelectorAll("span")[2]) {
+        advertiser = ad.querySelectorAll("span")[2].textContent;
+      } else {
+        advertiser = ad.textContent;
+      }
       let newShoppingAd = [
         date,
         keyword,
@@ -96,21 +117,27 @@ function selectShoppingAds(domObject) {
       allShoppingAds.push(newShoppingAd);
     });
   } else {
-    let noAds = [date, keyword, "N/A", "N/A", "N/A", "N/A", type];
+    let noAds = [
+      date,
+      keyword,
+      "N/A",
+      "N/A",
+      "N/A",
+      "N/A",
+      type,
+      "No shopping ads",
+    ];
     allShoppingAds.push(noAds);
   }
-  // console.log(allShoppingAds)
   return allShoppingAds;
 }
 
 function aggregateAds(domObject) {
   let allAds = selectTextAds(domObject);
-  console.log(allAds);
   let shoppingAds = selectShoppingAds(domObject);
   shoppingAds.forEach((element) => {
     allAds.push(element);
   });
-  // console.log(allAds);
   return allAds;
 }
 
@@ -137,4 +164,6 @@ async function sendAds(ads) {
       values: ads,
     },
   });
+  console.log("Ads have been exported succesfully")
+  console.log("closing browser")
 }
