@@ -14,9 +14,9 @@ const date =
   today.getHours() +
   ":" +
   today.getMinutes();
-
-  // This function launches a headless browser in order to scrape Google SERP.
-  // Please replace the value of the keyword variable with the keyword that you would like to search for.
+  
+// Please replace the value of the keyword variable with the keyword that you would like to search for.
+// This function launches a headless browser in order to scrape Google SERP.
 (async () => {
   console.log("launching browser");
   const browser = await firefox.launch();
@@ -48,7 +48,7 @@ function selectTextAds(domObject) {
       .forEach((ad, index) => {        
         let position = index + 1;
         let headline = ad.querySelector("[role]").textContent;
-        let description = "";
+        let description;
         if (ad.querySelector("em")) {
           description = ad.querySelector("em").parentElement.textContent;
         } else {
@@ -91,15 +91,16 @@ function selectShoppingAds(domObject) {
       .querySelector("*")
       .outerHTML.includes("top-pla-group-inner")
   ) {
-    console.log("Creating an array of shopping ads");
+    console.log("creating an array of shopping ads");
     let list = Array.from(
       domObject.window.document.querySelectorAll(".pla-unit-container")
     );
     list.pop();
+    // Creating array of shopping ads
     list.forEach((ad, index) => {
       let position = index + 1;
       let headline = ad.querySelector(".pla-unit-title").textContent;
-      let advertiser = "";
+      let advertiser;
       if (ad.querySelectorAll("span")[2]) {
         advertiser = ad.querySelectorAll("span")[2].textContent;
       } else {
