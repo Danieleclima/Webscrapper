@@ -16,7 +16,7 @@ const date =
   today.getMinutes();
   
 // Please replace the value of the keyword variable with the keyword that you would like to search for.
-// This function launches a headless browser in order to scrape Google SERP.
+// This function launches a headless firefox browser in order to scrape Google SERP. The playwright variable can also be changed in order to launch with Chromium or webkit rather than Firefox.
 (async () => {
   console.log("launching browser");
   const browser = await firefox.launch();
@@ -133,6 +133,7 @@ function selectShoppingAds(domObject) {
   return allShoppingAds;
 }
 
+// Combining both arrays
 function aggregateAds(domObject) {
   let allAds = selectTextAds(domObject);
   let shoppingAds = selectShoppingAds(domObject);
@@ -154,6 +155,7 @@ async function sendAds(ads) {
   // Instance of Google Sheets API
   const googleSheets = google.sheets({ version: "v4", auth: client });
 
+  // Google sheets spreadsheet ID
   const spreadsheetId = "1eQpKSozTwm1KhpexY8rNTweSeTscADqbCsSKTdHIUks";
 
   await googleSheets.spreadsheets.values.append({
