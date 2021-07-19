@@ -2,7 +2,7 @@ const { firefox } = require("playwright");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { google } = require("googleapis");
-const keyword = "shoes+for+men";
+const keyword = "men+shoes";
 const today = new Date();
 const date =
   today.getFullYear() +
@@ -100,8 +100,7 @@ function selectShoppingAds(domObject) {
     // Creating array of shopping ads
     list.forEach((ad, index) => {
       let position = index + 1;
-      let headline = ad.querySelector(".pla-unit-title").textContent;
-      let advertiser;
+      let headline = ad.querySelector(".pla-unit-title").textContent.replace("...", "-")
       if (ad.querySelectorAll("span")[2]) {
         advertiser = ad.querySelectorAll("span")[2].textContent.replace(" ...", "");
       } else {
