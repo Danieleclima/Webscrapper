@@ -14,8 +14,8 @@ const date =
   today.getHours() +
   ":" +
   today.getMinutes();
-  
-// Please replace the value of the keyword variable with the keyword that you would like to search for.
+
+// Please replace the value of the keyword variable above with the keyword that you would like to search for.
 // This function launches a headless firefox browser in order to scrape Google SERP. The playwright variable can also be changed in order to launch with Chromium or webkit rather than Firefox.
 (async () => {
   console.log("launching browser");
@@ -45,7 +45,7 @@ function selectTextAds(domObject) {
     console.log("creating an array of text ads");
     domObject.window.document
       .querySelectorAll("[data-text-ad]")
-      .forEach((ad, index) => {        
+      .forEach((ad, index) => {
         let position = index + 1;
         let headline = ad.querySelector("[role]").textContent;
         let description;
@@ -79,6 +79,7 @@ function selectTextAds(domObject) {
     ];
     allTextAds.push(noAds);
   }
+  console.log(allTextAds)
   return allTextAds;
 }
 
@@ -102,7 +103,7 @@ function selectShoppingAds(domObject) {
       let headline = ad.querySelector(".pla-unit-title").textContent;
       let advertiser;
       if (ad.querySelectorAll("span")[2]) {
-        advertiser = ad.querySelectorAll("span")[2].textContent;
+        advertiser = ad.querySelectorAll("span")[2].textContent.replace(" ...", "");
       } else {
         advertiser = ad.textContent;
       }
@@ -130,10 +131,11 @@ function selectShoppingAds(domObject) {
     ];
     allShoppingAds.push(noAds);
   }
+  console.log(allShoppingAds)
   return allShoppingAds;
 }
 
-// Combining both arrays
+// Combining both arrays in order to send all types of ads together
 function aggregateAds(domObject) {
   let allAds = selectTextAds(domObject);
   let shoppingAds = selectShoppingAds(domObject);
@@ -167,6 +169,6 @@ async function sendAds(ads) {
       values: ads,
     },
   });
-  console.log("Ads have been exported succesfully")
-  console.log("closing browser")
+  console.log("Ads have been exported succesfully");
+  console.log("closing browser");
 }
