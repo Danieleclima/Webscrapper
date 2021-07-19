@@ -79,7 +79,7 @@ function selectTextAds(domObject) {
     ];
     allTextAds.push(noAds);
   }
-  console.log(allTextAds)
+  console.log(allTextAds);
   return allTextAds;
 }
 
@@ -100,9 +100,13 @@ function selectShoppingAds(domObject) {
     // Creating array of shopping ads
     list.forEach((ad, index) => {
       let position = index + 1;
-      let headline = ad.querySelector(".pla-unit-title").textContent.replace("...", "-")
+      let headline = ad
+        .querySelector(".pla-unit-title")
+        .textContent.replace("...", "-");
       if (ad.querySelectorAll("span")[2]) {
-        advertiser = ad.querySelectorAll("span")[2].textContent.replace(" ...", "");
+        advertiser = ad
+          .querySelectorAll("span")[2]
+          .textContent.replace(" ...", "");
       } else {
         advertiser = ad.textContent;
       }
@@ -130,7 +134,7 @@ function selectShoppingAds(domObject) {
     ];
     allShoppingAds.push(noAds);
   }
-  console.log(allShoppingAds)
+  console.log(allShoppingAds);
   return allShoppingAds;
 }
 
