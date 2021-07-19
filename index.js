@@ -67,6 +67,7 @@ function selectTextAds(domObject) {
         allTextAds.push(newTextAd);
       });
   } else {
+    // creating an array in case there's no text ads
     let noAds = [
       date,
       keyword,
@@ -122,6 +123,7 @@ function selectShoppingAds(domObject) {
       allShoppingAds.push(newShoppingAd);
     });
   } else {
+    // creating an array in case there's no shopping ads
     let noAds = [
       date,
       keyword,
