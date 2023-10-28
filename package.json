@@ -7,6 +7,7 @@
   "author": "Daniel Lima",
   "license": "ISC",
   "dependencies": {
+    "chai": "^4.3.10",
     "googleapis": "^81.0.0",
     "jsdom": "^16.6.0",
     "selenium-webdriver": "^4.0.0-beta.4"
@@ -14,6 +15,8 @@
   "devDependencies": {
     "@playwright/test": "^1.39.0",
     "@types/node": "^20.8.9",
-    "playwright": "^1.12.3"
+    "playwright": "^1.12.3",
+    "chai": "*",
+    "mocha": "*"
   }
 }
