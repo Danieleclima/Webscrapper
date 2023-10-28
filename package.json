@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "mocha tests"
+  },
   "author": "Daniel Lima",
   "license": "ISC",
   "dependencies": {
@@ -15,8 +17,9 @@
   "devDependencies": {
     "@playwright/test": "^1.39.0",
     "@types/node": "^20.8.9",
-    "playwright": "^1.12.3",
     "chai": "*",
-    "mocha": "*"
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "playwright": "^1.12.3"
   }
 }
