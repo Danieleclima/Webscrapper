@@ -2,7 +2,7 @@ const { firefox } = require("playwright");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { google } = require("googleapis");
-const keyword = "men+shoes";
+const keyword = "flights+to+japan";
 const today = new Date();
 const date =
   today.getFullYear() +
@@ -17,7 +17,8 @@ const date =
 
 // Please replace the value of the keyword variable above with the keyword that you would like to search for.
 // This function launches a headless firefox browser in order to scrape Google SERP. The playwright variable can also be changed in order to launch with Chromium or webkit rather than Firefox.
-(async () => {
+
+ (async () => {
   console.log("launching browser");
   const browser = await firefox.launch();
   const context = await browser.newContext();
@@ -177,3 +178,5 @@ async function sendAds(ads) {
   console.log("Ads have been exported succesfully");
   console.log("closing browser");
 }
+
+module.exports = {selectTextAds, selectShoppingAds}
